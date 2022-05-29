@@ -12,6 +12,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AWS_REGION: ap-southeast-2
+  TF_CLOUD_ORGANIZATION: ash-dey
+
 jobs:
 
   DeployDev:
