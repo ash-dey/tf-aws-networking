@@ -6,24 +6,23 @@ on:
       - dev
       - main
   pull_request:
+    types: [opened, reopened]
     branches:
       - dev
       - main
   workflow_dispatch:
 
-env:
-  AWS_REGION: ap-southeast-2
-
 jobs:
 
   DeployDev:
-    if: (github.event.ref == 'refs/heads/dev' && github.event_name == 'pull_request')
+    name: Deploy to dev
+    if: ${{github.ref == 'refs/heads/dev' && github.event_name == 'pull_request'}}
     runs-on: ubuntu-latest
     environment: dev
     env:
       DeployTo: dev
       TF_WORKSPACE: tf-aws-networking-dev-ap-southeast-2
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         working-directory: ./
@@ -62,7 +61,7 @@ jobs:
 
   DeployUat:
     name: Deploy to uat
-    if: (github.event.ref == 'refs/heads/dev' && github.event_name == 'push')
+    if: ${{github.ref == 'refs/heads/dev' && github.event_name == 'push'}}
     runs-on: ubuntu-latest
     environment: uat
     env:
@@ -108,7 +107,7 @@ jobs:
 
   DeployStaging:
     name: Deploy to staging
-    if: (github.event.ref == 'refs/heads/main' && github.event_name == 'pull_request')
+    if: ${{github.ref == 'refs/heads/main' && github.event_name == 'pull_request'}}
     runs-on: ubuntu-latest
     environment: staging
     env:
@@ -154,7 +153,7 @@ jobs:
 
   DeployProd:
     name: Deploy to production
-    if: (github.event.ref == 'refs/heads/main' && github.event_name == 'push')
+    if: ${{github.ref == 'refs/heads/main' && github.event_name == 'push'}}
     runs-on: ubuntu-latest
     environment: prod
     env:
