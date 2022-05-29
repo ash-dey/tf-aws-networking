@@ -67,7 +67,7 @@ jobs:
     env:
       DeployTo: uat
       TF_WORKSPACE: tf-aws-networking-uat-ap-southeast-2
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         working-directory: ./
