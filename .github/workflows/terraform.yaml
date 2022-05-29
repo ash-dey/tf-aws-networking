@@ -60,7 +60,6 @@ jobs:
       - name: execute
         run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
 
-
   DeployUat:
     name: Deploy to uat
     if: (github.event.ref == 'refs/heads/dev' && github.event_name == 'push')
