@@ -20,7 +20,8 @@ jobs:
 
   DeployDev:
     name: Deploy to dev
-    if: ${{github.ref == 'refs/heads/dev' && github.event_name == 'pull_request'}}
+    # if: ${{github.ref == 'refs/heads/dev' && github.event_name == 'pull_request'}}
+
     runs-on: ubuntu-latest
     environment: dev
     env:
@@ -34,6 +35,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Verify the workspace context
+        run: echo 'Referred branch is ${{ github.ref }}'
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -41,19 +45,19 @@ jobs:
 
       - name: Terraform Format
         id: fmt
-        run: terraform fmt -check
+        # run: terraform fmt -check
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        # run: terraform init
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color
+        # run: terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
+        # run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
         continue-on-error: true
 
       - name: Terraform Plan Status
@@ -61,7 +65,7 @@ jobs:
         run: exit 1
 
       - name: execute
-        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
+        # run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
 
   DeployUat:
     name: Deploy to uat
