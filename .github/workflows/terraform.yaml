@@ -26,7 +26,7 @@ jobs:
     environment: dev
     env:
       DeployTo: dev
-      TF_WORKSPACE: tf-aws-networking-dev-ap-southeast-2
+      TF_WORKSPACE: ${{github.event.repository.name}}-$DeployTo-$AWS_REGION
     # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
@@ -35,15 +35,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Print event data
-        env:
-          EVENT: ${{ toJSON( github.event ) }}
-        run: echo "$EVENT"
-
       - name: Verify the workspace context
         run: |
-          echo 'pull request to branch ${{github.event.pull_request.base.ref}}'
-          echo 'Name of the repo using github.event.repository.name ${{github.event.repository.name}}'
+          echo 'repo name ${{github.event.repository.name}}
+          echo 'branch name ${{github.event.pull_request.base.ref}}'
+          echo 'Terraform workspace name $TF_WORKSPACE'
+          echo 'deploy to environment $DeployTo'
+          echo 'AWS Region $AWS_REGION'
 
 #      - name: Setup Terraform
 #        uses: hashicorp/setup-terraform@v2
