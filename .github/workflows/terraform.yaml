@@ -39,8 +39,8 @@ jobs:
         run: |
           echo 'repo name ${{github.event.repository.name}}'
           echo 'branch name ${{github.event.pull_request.base.ref}}'
-          echo 'Terraform workspace name $TF_WORKSPACE'
-          echo 'deploy to environment $DeployTo'
+          echo "Terraform workspace name $TF_WORKSPACE"
+          echo "deploy to environment $DeployTo"
           echo "AWS Region $AWS_REGION"
 
 #      - name: Setup Terraform
