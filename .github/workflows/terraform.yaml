@@ -27,8 +27,7 @@ jobs:
     environment: dev
     env:
       DeployTo: dev
-    #  TF_WORKSPACE: ${{github.event.repository.name}}-dev-ap-southeast-2
-    #  Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+
     defaults:
       run:
         working-directory: ./
