@@ -1,3 +1,4 @@
+/*
 variable "region" {
   description = "Name of the AWS region to deploy resources"
   type        = string
@@ -8,7 +9,6 @@ variable "tags" {
   description = "Tags to apply to created resources"
   type        = map(string)
 }
-
 variable "organization_name" {
   description = "Name of the Terraform Cloud Organization"
   type        = string
@@ -20,13 +20,27 @@ variable "repo_name" {
   type        = string
   default     = "tf-aws-networking"
 }
+*/
 
-variable "deploy_env" {
+variable "env" {
   description = "Name of the environment ot depploy resources"
   type        = string
 }
 
-variable "workspace_name" {
-  description = "Name of the workspace"
+variable "app" {
+  description = "Name of the app"
   type        = string
+  default     = "core-networking"
+}
+
+variable "owner" {
+  description = "Name of the owner"
+  type        = string
+  default     = "ICT Infrastructure"
+}
+
+variable "deploy" {
+  description = "Tools used to deploy"
+  type        = string
+  default     = "Terraform"
 }
