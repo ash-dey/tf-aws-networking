@@ -1,5 +1,6 @@
 name: "Terraform"
-
+# for each job ensure that environment and env variables reflect correct deployment environment
+# TF_WORKSPACE - set correct target for each environment
 on:
   push:
     branches:
@@ -18,60 +19,61 @@ env:
 
 jobs:
 
-  DeployDev:
-    name: Deploy to dev
-    if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
-
-    runs-on: ubuntu-latest
-    environment: dev
-    env:
-      DeployTo: dev
-      TF_WORKSPACE: ${{github.event.repository.name}}-dev-ap-southeast-2
-    # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-    defaults:
-      run:
-        working-directory: ./
-        shell: bash
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
-        continue-on-error: true
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: execute
-        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
+#  DeployDev:
+#    name: Deploy to dev
+#    if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
+#
+#    runs-on: ubuntu-latest
+#    environment: dev
+#    env:
+#      DeployTo: dev
+#      TF_WORKSPACE: ${{github.event.repository.name}}-dev-ap-southeast-2
+#    # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+#    defaults:
+#      run:
+#        working-directory: ./
+#        shell: bash
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Setup Terraform
+#        uses: hashicorp/setup-terraform@v2
+#        with:
+#          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+#
+#      - name: Terraform Format
+#        id: fmt
+#        run: terraform fmt -check
+#
+#      - name: Terraform Init
+#        id: init
+#        run: terraform init
+#
+#      - name: Terraform Validate
+#        id: validate
+#        run: terraform validate -no-color
+#
+#      - name: Terraform Plan
+#        id: plan
+#        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
+#        continue-on-error: true
+#
+#      - name: Terraform Plan Status
+#        if: steps.plan.outcome == 'failure'
+#        run: exit 1
+#
+#      - name: Terraform apply
+#        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
 
   DeployUat:
     name: Deploy to uat
     if: ${{github.ref == 'refs/heads/dev' && github.event_name == 'push'}}
+
     runs-on: ubuntu-latest
     environment: uat
     env:
       DeployTo: uat
-      TF_WORKSPACE: tf-aws-networking-uat-ap-southeast-2
+      TF_WORKSPACE: ${{github.event.repository.name}}-uat-ap-southeast-2
     # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
@@ -80,35 +82,39 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Print event data
+        env:
+          EVENT: ${{ toJSON( github.event ) }}
+        run: echo "$EVENT"
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
-        continue-on-error: true
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: execute
-        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
-
+#      - name: Setup Terraform
+#        uses: hashicorp/setup-terraform@v2
+#        with:
+#          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+#
+#      - name: Terraform Format
+#        id: fmt
+#        run: terraform fmt -check
+#
+#      - name: Terraform Init
+#        id: init
+#        run: terraform init
+#
+#      - name: Terraform Validate
+#        id: validate
+#        run: terraform validate -no-color
+#
+#      - name: Terraform Plan
+#        id: plan
+#        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
+#        continue-on-error: true
+#
+#      - name: Terraform Plan Status
+#        if: steps.plan.outcome == 'failure'
+#        run: exit 1
+#
+#      - name: Terraform apply
+#        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
 
   DeployStaging:
     name: Deploy to staging
