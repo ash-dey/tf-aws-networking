@@ -1,6 +1,6 @@
 name: "Terraform"
-# for each job ensure that environment and env variables reflect correct deployment environment
-# TF_WORKSPACE - set correct target for each environment
+#  for each job ensure that environment and env variables reflect correct deployment environment
+#  TF_WORKSPACE - set correct target for each environment
 on:
   push:
     branches:
