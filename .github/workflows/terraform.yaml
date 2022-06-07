@@ -19,23 +19,29 @@ env:
 
 jobs:
 
-#  DeployDev:
-#    name: Deploy to dev
-#    if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
-#
-#    runs-on: ubuntu-latest
-#    environment: dev
-#    env:
-#      DeployTo: dev
-#      TF_WORKSPACE: ${{github.event.repository.name}}-dev-ap-southeast-2
-#    # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-#    defaults:
-#      run:
-#        working-directory: ./
-#        shell: bash
-#    steps:
-#      - uses: actions/checkout@v3
-#
+  DeployDev:
+    name: Deploy to dev
+    if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
+
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DeployTo: dev
+    #   TF_WORKSPACE: ${{github.event.repository.name}}-dev-ap-southeast-2
+    # Use the Bash shell regardless of GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        working-directory: ./
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: set environment variables for pull req to dev branch
+        if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
+        run: |
+            echo "TF_WORKSPACE for dev ${{github.event.repository.name}}-${{github.event.pull_request.base.ref}}-$AWS_REGION"
+            echo "tfvars file for dev ./var/${{github.event.pull_request.base.ref}}.tfvars"
+
 #      - name: Setup Terraform
 #        uses: hashicorp/setup-terraform@v2
 #        with:
