@@ -1,6 +1,5 @@
 name: "Terraform"
-#  for each job ensure that environment and env variables reflect correct deployment environment
-#  TF_WORKSPACE - set correct target for each environment
+
 on:
   push:
     branches:
@@ -19,14 +18,12 @@ env:
 
 jobs:
 
-  DeployDev:
+  dev:
     name: Deploy to dev
     if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
 
     runs-on: ubuntu-latest
     environment: dev
-    env:
-      DeployTo: dev
 
     defaults:
       run:
@@ -35,44 +32,40 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set environment variables for pull req to dev branch
-        # if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
+      - name: set environment variables
         run: |
-            echo "TF_WORKSPACE for dev ${{github.event.repository.name}}-${{github.event.pull_request.base.ref}}-$AWS_REGION"
-            echo "DeployTo=${{github.event.pull_request.base.ref}}" >> $GITHUB_ENV
-            echo "tfvars file for dev ./var/${{ env.DeployTo }}.tfvars"
-            echo "job id for dev ${GITHUB_JOB}"
+          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
 
-#      - name: Setup Terraform
-#        uses: hashicorp/setup-terraform@v2
-#        with:
-#          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-#
-#      - name: Terraform Format
-#        id: fmt
-#        run: terraform fmt -check
-#
-#      - name: Terraform Init
-#        id: init
-#        run: terraform init
-#
-#      - name: Terraform Validate
-#        id: validate
-#        run: terraform validate -no-color
-#
-#      - name: Terraform Plan
-#        id: plan
-#        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
-#        continue-on-error: true
-#
-#      - name: Terraform Plan Status
-#        if: steps.plan.outcome == 'failure'
-#        run: exit 1
-#
-#      - name: Terraform apply
-#        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-  DeployUat:
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false -var-file="./vars/${GITHUB_JOB}.tfvars"
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve -input=false -var-file=./vars/${GITHUB_JOB}.tfvars
+
+  uat:
     name: Deploy to uat
     if: ${{github.ref == 'refs/heads/dev' && github.event_name == 'push'}}
 
@@ -87,46 +80,43 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set environment variables for merge to dev branch
-        # if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
+      - name: set environment variables
         run: |
-            echo "TF_WORKSPACE for uat ${{github.event.repository.name}}-${GITHUB_REF#refs/heads/}-$AWS_REGION"
-            echo "DeployTo=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-            echo "tfvars file for dev ./var/${{ env.DeployTo }}.tfvars"
-            echo "job id for uat ${GITHUB_JOB}"
+          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
 
-#      - name: Setup Terraform
-#        uses: hashicorp/setup-terraform@v2
-#        with:
-#          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-#
-#      - name: Terraform Format
-#        id: fmt
-#        run: terraform fmt -check
-#
-#      - name: Terraform Init
-#        id: init
-#        run: terraform init
-#
-#      - name: Terraform Validate
-#        id: validate
-#        run: terraform validate -no-color
-#
-#      - name: Terraform Plan
-#        id: plan
-#        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
-#        continue-on-error: true
-#
-#      - name: Terraform Plan Status
-#        if: steps.plan.outcome == 'failure'
-#        run: exit 1
-#
-#      - name: Terraform apply
-#        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-  DeployStaging:
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false -var-file="./vars/${GITHUB_JOB}.tfvars"
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve -input=false -var-file=./vars/${GITHUB_JOB}.tfvars
+
+  staging:
     name: Deploy to staging
-    if: ${{github.ref == 'refs/heads/main' && github.event_name == 'pull_request'}}
+    if: ${{github.event.pull_request.base.ref == 'main' && github.event_name == 'pull_request'}}
+
     runs-on: ubuntu-latest
     environment: staging
 
@@ -138,12 +128,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set environment variables for pull req to main branch
-        # if: ${{github.event.pull_request.base.ref == 'dev' && github.event_name == 'pull_request'}}
+      - name: set environment variables
         run: |
-            echo "TF_WORKSPACE for staging ${{github.event.repository.name}}-${{github.event.pull_request.base.ref}}-$AWS_REGION"
-            echo "DeployTo=staging" >> $GITHUB_ENV
-            echo "tfvars file for staging ./var/${{ env.DeployTo }}.tfvars"
+          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -164,25 +151,24 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
+        run: terraform plan -no-color -input=false -var-file="./vars/${GITHUB_JOB}.tfvars"
         continue-on-error: true
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: execute
-        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
+#      - name: execute
+#        run: terraform apply -auto-approve -input=false -var-file=./vars/${GITHUB_JOB}.tfvars
 
 
-  DeployProd:
+  prod:
     name: Deploy to production
     if: ${{github.ref == 'refs/heads/main' && github.event_name == 'push'}}
+
     runs-on: ubuntu-latest
     environment: prod
-    env:
-      DeployTo: prod
-      TF_WORKSPACE: tf-aws-networking-prod-ap-southeast-2
+
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
@@ -191,6 +177,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: set environment variables
+        run: |
+          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -210,15 +200,15 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false -var-file="./vars/$DeployTo.tfvars"
+        run: terraform plan -no-color -input=false -var-file="./vars/${GITHUB_JOB}.tfvars"
         continue-on-error: true
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: execute
-        run: terraform apply -auto-approve -input=false -var-file=./vars/$DeployTo.tfvars
+#      - name: execute
+#        run: terraform apply -auto-approve -input=false -var-file=./vars/${GITHUB_JOB}.tfvars
 
 
 
