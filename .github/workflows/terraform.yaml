@@ -35,7 +35,7 @@ jobs:
 
       - name: set environment variables
         run: |
-          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
+          echo "TF_WORKSPACE=${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -83,7 +83,7 @@ jobs:
 
       - name: set environment variables
         run: |
-          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
+          echo "TF_WORKSPACE=${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -131,7 +131,7 @@ jobs:
 
       - name: set environment variables
         run: |
-          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
+          echo "TF_WORKSPACE=${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -180,7 +180,7 @@ jobs:
 
       - name: set environment variables
         run: |
-          export TF_WORKSPACE="${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION"
+          echo "TF_WORKSPACE=${{github.event.repository.name}}-${GITHUB_JOB}-$AWS_REGION" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
